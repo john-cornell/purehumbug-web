@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Pure Humbug - Playlists</title>
+<style>
+  body { font-family: "Courier New", Courier, monospace; margin: 2em; }
+  audio { width: 640px; max-width: 100%; display: block; margin: 1em 0; }
+  select { font-family: inherit; font-size: 1em; padding: 0.25em; max-width: 640px; }
+  ol#tracks { max-width: 640px; padding-left: 2em; }
+  #tracks li { margin: 0.2em 0; }
+  #tracks a { text-decoration: none; }
+  #tracks a:hover { text-decoration: underline; }
+  li.current a { font-weight: bold; color: #0a328c; }
+</style>
+</head>
+<body>
+<h1>Playlists</h1>
+<p>Now playing: <span id="nowplaying">nothing yet &mdash; pick a track below</span></p>
+<audio id="player" controls preload="none"></audio>
+<p><label for="pl">Playlist:</label>
+<select id="pl"><option>Loading playlists...</option></select></p>
+<ol id="tracks"><li>Loading track list...</li></ol>
+<p><a href="../">Back to the front page</a></p>
+<script>
+(function () {
+  var player = document.getElementById('player');
+  var list = document.getElementById('tracks');
+  var now = document.getElementById('nowplaying');
+  var sel = document.getElementById('pl');
+  var tracks = [];
+  var current = -1;
+
+  function urlOf(path) {
+    return '/' + path.split('/').map(encodeURIComponent).join('/');
+  }
+
+  function play(i) {
+    if (current >= 0) list.children[current].classList.remove('current');
+    current = i;
+    player.src = urlOf(tracks[i].path);
+    player.play();
+    now.textContent = tracks[i].name;
+    list.children[i].classList.add('current');
+  }
+
+  function loadPlaylist(name) {
+    fetch('manifests/' + name).then(function (r) { return r.text(); }).then(function (t) {
+      tracks = t.split('\n').map(function (l) { return l.trim(); })
+        .filter(Boolean).map(function (p) {
+          var base = p.split('/').pop();
+          return {
+            path: p,
+            name: decodeURIComponent(base).replace(/\.[^.]+$/, '').replace(/_/g, ' ')
+          };
+        });
+      list.innerHTML = '';
+      if (!tracks.length) {
+        list.innerHTML = '<li>This playlist is empty.</li>';
+        return;
+      }
+      tracks.forEach(function (tr, i) {
+        var li = document.createElement('li');
+        var a = document.createElement('a');
+        a.textContent = (i + 1) + '. ' + tr.name;
+        a.href = '#';
+        a.addEventListener('click', function (e) { e.preventDefault(); play(i); });
+        li.appendChild(a);
+        list.appendChild(li);
+      });
+      play(0);
+    }).catch(function () {
+      list.innerHTML = '<li>Could not load this playlist.</li>';
+    });
+  }
+
+  fetch('manifests/').then(function (r) { return r.text(); }).then(function (html) {
+    var doc = new DOMParser().parseFromString(html, 'text/html');
+    var links = doc.querySelectorAll('a');
+    var names = [];
+    for (var i = 0; i < links.length; i++) {
+      var href = links[i].getAttribute('href');
+      if (/\.txt$/i.test(href)) names.push(href);
+    }
+    if (!names.length) {
+      list.innerHTML = '<li>No playlists found in manifests/ yet.</li>';
+      sel.innerHTML = '<option>none</option>';
+      return;
+    }
+    var first = ['get this 2006.txt', 'get this 2007.txt', '2008 - podcast 163.txt', 'other tony stuff.txt', 'other ed stuff.txt'];
+    var label = {
+      'get this 2006.txt': 'Get This 2006',
+      'get this 2007.txt': 'Get This 2007',
+      '2008 - podcast 163.txt': '2008 - Podcast 163',
+      'other tony stuff.txt': 'Other Tony Stuff',
+      'other ed stuff.txt': 'Other Ed Stuff'
+    };
+    names.sort(function (a, b) {
+      var ai = first.indexOf(decodeURIComponent(a).toLowerCase());
+      var bi = first.indexOf(decodeURIComponent(b).toLowerCase());
+      if (ai !== -1 && bi !== -1) return ai - bi;
+      if (ai !== -1) return -1;
+      if (bi !== -1) return 1;
+      return a.localeCompare(b, undefined, { sensitivity: 'base' });
+    });
+    sel.innerHTML = '';
+    names.forEach(function (name) {
+      var opt = document.createElement('option');
+      opt.value = name;
+      opt.textContent = label[name.toLowerCase()] ||
+        decodeURIComponent(name).replace(/\.txt$/, '');
+      sel.appendChild(opt);
+    });
+    sel.addEventListener('change', function () { loadPlaylist(sel.value); });
+    loadPlaylist(names[0]);
+  }).catch(function () {
+    list.innerHTML = '<li>Could not load the playlist list.</li>';
+  });
+
+  player.addEventListener('ended', function () {
+    if (current + 1 < tracks.length) play(current + 1);
+  });
+})();
+</script>
+</body>
+</html>
