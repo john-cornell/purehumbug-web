@@ -114,6 +114,8 @@
             path: p,
             name: decodeURIComponent(base).replace(/\.[^.]+$/, '').replace(/_/g, ' ')
                 .replace(/^\s*\d+\.\s*/, '')
+                .replace(/([a-z])([A-Z])/g, '$1 $2')
+                .replace(/([a-zA-Z])(\d+)/g, '$1 $2')
           };
         });
       list.innerHTML = '';
