@@ -4,19 +4,30 @@
 <meta charset="utf-8">
 <title>Pure Humbug - Playlists</title>
 <style>
-  body { font-family: "Courier New", Courier, monospace; margin: 2em; }
-  #audioplayer { width: 640px; max-width: 100%; display: block; margin: 1em 0; }
-  #videoplayer { width: 640px; max-width: 100%; display: block; margin: 1em 0; background: #000; }
-  .pagehead { display: flex; align-items: baseline; justify-content: space-between;
-              max-width: 640px; gap: 12px; }
-  .pagehead h1 { margin: 0; }
-  .pagehead .back { font-size: 0.85em; white-space: nowrap; }
-  select { font-family: inherit; font-size: 1em; padding: 0.25em; max-width: 640px; }
-  ol#tracks { max-width: 640px; padding-left: 2em; }
-  #tracks li { margin: 0.2em 0; }
-  #tracks a { text-decoration: none; }
+  body { margin: 0; background: #eef0f3; color: #1d2733;
+         font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+  .pagehead { display: flex; align-items: center; gap: 20px;
+              max-width: 780px; margin: 24px auto 0; padding: 18px 24px;
+              background: #fff; border: 1px solid #dfe3e8; border-radius: 10px; }
+  .pagehead h1 { margin: 0; font-size: 34px; letter-spacing: 1px; flex: 1;
+                 font-family: "Courier New", Courier, monospace; }
+  .pagehead .back { font-size: 0.85em; white-space: nowrap; color: #5a6a7a; text-decoration: none; }
+  .pagehead .back:hover { text-decoration: underline; }
+  main.content { max-width: 780px; margin: 16px auto 40px; padding: 22px 26px;
+                 background: #fff; border: 1px solid #dfe3e8; border-radius: 10px;
+                 line-height: 1.55; }
+  #audioplayer { width: 100%; display: block; margin: 1em 0; }
+  #videoplayer { width: 100%; display: block; margin: 1em 0; background: #000; border-radius: 6px; }
+  #nowplaying { color: #5a6a7a; font-style: italic; margin: 0.8em 0; }
+  select { font-family: inherit; font-size: 1em; padding: 0.35em; max-width: 100%; }
+  ol#tracks { list-style: none; padding-left: 0; }
+  #tracks li { margin: 0.3em 0; }
+  #tracks a { text-decoration: none; color: #0a328c; }
   #tracks a:hover { text-decoration: underline; }
-  li.current a { font-weight: bold; color: #0a328c; }
+  li.current a { font-weight: bold; }
+  @media (max-width: 640px) {
+    .pagehead { flex-direction: column; text-align: center; gap: 6px; }
+  }
 </style>
 </head>
 <body>
@@ -24,12 +35,14 @@
 <h1>Playlists</h1>
 <a class="back" href="../">Back to the front page</a>
 </div>
+<main class="content">
 <p>Now playing: <span id="nowplaying">nothing yet, pick a track below</span></p>
 <audio id="audioplayer" controls preload="none"></audio>
 <video id="videoplayer" controls preload="none"></video>
 <p><label for="pl">Playlist:</label>
 <select id="pl"><option>Loading playlists...</option></select></p>
 <ol id="tracks"><li>Loading track list...</li></ol>
+</main>
 
 <script>
 (function () {
@@ -49,6 +62,20 @@
     videoEl.style.display = kind === 'video' ? 'block' : 'none';
   }
 
+  var positions = {};
+  try { positions = JSON.parse(localStorage.getItem('purehumbug-positions') || '{}'); } catch (e) { positions = {}; }
+  var lastSave = 0;
+  function fmt(s) { s = Math.floor(s); return Math.floor(s / 60) + ':' + ('0' + (s % 60)).slice(-2); }
+  function savePosition() {
+    if (!activeEl || current < 0 || !activeEl.currentTime) return;
+    var t = activeEl.currentTime;
+    if (t > lastSave && t - lastSave < 4) return;
+    lastSave = t;
+    var p = tracks[current].path;
+    if (activeEl.duration && t > activeEl.duration - 15) { delete positions[p]; } else { positions[p] = t; }
+    try { localStorage.setItem('purehumbug-positions', JSON.stringify(positions)); } catch (e) {}
+  }
+
   function urlOf(path) {
     return '/' + path.split('/').map(encodeURIComponent).join('/');
   }
@@ -61,9 +88,19 @@
     var el = els[kind];
     if (activeEl && activeEl !== el) { activeEl.pause(); activeEl.removeAttribute('src'); activeEl.load(); }
     activeEl = el;
+    lastSave = 0;
     el.src = urlOf(tracks[i].path);
+    var saved = positions[tracks[i].path] || 0;
+    var resume = saved > 5;
+    if (resume) {
+      el.addEventListener('loadedmetadata', function () {
+        if (el.duration && saved > el.duration - 15) return;
+        try { el.currentTime = saved; } catch (e) {}
+        now.textContent = tracks[i].name + ' (resuming at ' + fmt(saved) + ')';
+      }, { once: true });
+    }
     el.play();
-    now.textContent = tracks[i].name;
+    now.textContent = tracks[i].name + (resume ? ' (resuming...)' : '');
     list.children[i].classList.add('current');
   }
 
@@ -75,6 +112,7 @@
           return {
             path: p,
             name: decodeURIComponent(base).replace(/\.[^.]+$/, '').replace(/_/g, ' ')
+                .replace(/^\s*\d+\.\s*/, '')
           };
         });
       list.innerHTML = '';
@@ -91,7 +129,6 @@
         li.appendChild(a);
         list.appendChild(li);
       });
-      play(0);
     }).catch(function () {
       list.innerHTML = '<li>Could not load this playlist.</li>';
     });
@@ -141,10 +178,17 @@
   });
 
   [audioEl, videoEl].forEach(function (el) {
+    el.addEventListener('timeupdate', savePosition);
+    el.addEventListener('pause', savePosition);
     el.addEventListener('ended', function () {
+      if (current >= 0) {
+        delete positions[tracks[current].path];
+        try { localStorage.setItem('purehumbug-positions', JSON.stringify(positions)); } catch (e) {}
+      }
       if (current + 1 < tracks.length) play(current + 1);
     });
   });
+  setActive('audio');
 })();
 </script>
 </body>
