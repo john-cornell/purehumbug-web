@@ -379,58 +379,71 @@
 		}
 	</script>
 
+<style>
+  body { margin: 0; background: #eef0f3; color: #1d2733;
+         font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+  header.site-header { display: flex; align-items: center; gap: 20px;
+                       max-width: 780px; margin: 24px auto 0; padding: 18px 24px;
+                       background: #fff; border: 1px solid #dfe3e8; border-radius: 10px; }
+  header.site-header img { height: 110px; width: auto; }
+  header.site-header h1 { margin: 0; font-size: 46px; letter-spacing: 1px;
+                          font-family: "Courier New", Courier, monospace; }
+  header.site-header .titles { flex: 1; }
+  header.site-header #byline { margin-top: 6px; color: #5a6a7a; font-style: italic; text-align: right; }
+  header.site-header .welcome { margin: 12px 0 0; font-size: 14px; color: #5a6a7a; text-align: right; }
+  main.content { max-width: 780px; margin: 16px auto 40px; padding: 22px 26px;
+                 background: #fff; border: 1px solid #dfe3e8; border-radius: 10px;
+                 line-height: 1.55; }
+  main.content a { color: #0a328c; text-decoration: none; border-bottom: 1px dotted #0a328c; }
+  main.content a:hover { text-decoration: underline; border-bottom: none; }
+  main.content ul { padding-left: 1.2em; }
+  main.content li { margin: 0.45em 0; }
+  main.content .dates { margin-top: 24px; padding-top: 14px; border-top: 1px solid #e6e9ee; }
+  main.content .dates, main.content .contact { color: #5a6a7a; font-size: 14px; }
+  @media (max-width: 640px) {
+    header.site-header { flex-direction: column; text-align: center; }
+    header.site-header #byline { text-align: center; }
+    header.site-header .welcome { text-align: center; }
+  }
+</style>
 </head>
 <body>
-    <table border="0">
-        <tbody><tr id="fred">
-            <td style="height: 124px;">
-                <img src="images/3goonsS.png">
-            </td>
-            <td style="height: 124px;">
-                
-                <span><strong><span style="font-family: Courier New; font-size: 60pt;">Pure Humbug</span></strong></span>                                
-                    <span style="font-family: Courier New"><div id="byline" style="text-align:right">Too much dental care, not enough tatts.</div></span>
-                           
-            </td>
-        </tr>
-    </tbody></table>
-    <br>
-    <span style="font-family: Courier New">
-        <br>
-        Welcome to the <strike>All New</strike> (let's face it, somewhat dated) Pure Humbug site.<br>
-        <br>
-       <a href="http://www.overheadclacks.com" target="_blank">GNU Terry Pratchett</a>. <br>
-	   
-	   <br>
-	   Dates have been put in front of filenames so that they are listed in chronological order. Dates are in YYYYMMDD format. Some of these dates may be a little bit out, especially when the DD at the end has been left as 00. So let us know which dates and file-names are wrong if you'd like to help. 
-	   </P>
-	   
-	   
-	   
-	   <br>
-        <br>
-        Anyway, You will find :
+    <header class="site-header">
+        <img src="images/3goonsS.png" alt="Pure Humbug">
+        <div class="titles">
+            <h1>Pure Humbug</h1>
+            <div id="byline">Too much dental care, not enough tatts.</div>
+            <p class="welcome">Now with newly added https certificate, playlists, <b>Martin & Molloy episodes</b>, and more!</p>
+        </div>
+    </header>
+    <main class="content">
         <ul>
-            <li><b>Playlists</b>: pick and play MP3s,
-                <a href="playlists/">Get This 2006</a> and <a href="playlists/">Get This 2007</a>, and much more!
+            <li><b><a href="playlists/">Playlists</a></b>: pick and play MP3s,
+                Get This 2006 and Get This 2007, and much more!
                 Including some Martin & Molloy episodes.</li>
-            <li><b>The files for download</b>, including the shows Get This 2006, Get This 2007,
-                and more <a href="shows/">here</a>.</li>
-	    <li><b>Podcast feed of the full shows</b>: in Apple Podcasts / Overcast / Pocket Casts, use "Add by URL"
-                &rarr; <a href="feed.xml">https://purehumbug.com/feed.xml</a>. It won't appear in Apple's directory search.
-                Other podcast apps, probably similar.</li>
-	    <li><b>Podcast 163 - Marsland Lives</b> <a href="shows/2008%20-%20Podcast%20163/GETTHISPodcast163_RICHARD%20MARSLAND.mp3">here</a>.</li>
-	    <li><b>Miscellaneous Tony (and Ed and Rich) File List.</b><a href="shows/Tony">here</a>.</li>
-	    <li><b>Illegal Download</b>, <a href="shows/Misc/IllegalDownload/">here</a>.</li>
-	    <li>Get This <b>Ring Tones</b> then click <a href="shows/Misc/Ring%20Tones/iphone/">here</a> for iphone, or <a href="shows/Misc/Ring%20Tones/MP3/">here</a> for MP3.</li>
-	    <li><b>Snato, Tam and Fred's Cup Fever</b> <a href="shows/Ed/worldcup/">here</a>.</li>
-	    <li><b>Sancho, Stan and Jed's Sp0rts Fever</b> <a href="shows/Ed/sportsfever/">here</a>.</li>
-            <li><b>Panto, Clan and Med's TotaI FootbaII</b> <a href="shows/Ed/totaIfootbaII/">here</a>.</li>
-	    <li><b>Santo and Sam - Going For Gold</b> <a href="shows/Santo%20and%20Sam%20-%20The%20Rush%20Hour%20-%20Going%20For%20Gold/">here</a>.</li>
-	    <li>For the <b>Pure Humbug directory listings</b> click <a href="shows/">here</a>, and decided later.<br></li>
+            <li><b><a href="shows/">The files for download</a></b>, including the shows
+                Get This 2006, Get This 2007, and much more.</li>
+	    <li><b><a href="feed.xml">Podcast feed of the full shows</a></b>:
+                use "Add by URL" in any podcast app (Apple Podcasts, Overcast, Pocket Casts,
+                others probably similar) with <a href="https://purehumbug.com/feed.xml">this address</a>.
+                Not listed in Apple's directory search.</li>
+	    <li><b><a href="https://pod.link/1830382040">People Want Ducks!</a></b> The great Get This tribute podcast,
+                with interviews with Tony, Ed and many more.</li>
+	    <li><b><a href="shows/2008%20-%20Podcast%20163/GETTHISPodcast163_RICHARD%20MARSLAND.mp3">Podcast 163 - Marsland Lives</a></b>.</li>
+	    <li><b><a href="shows/Tony">Miscellaneous Tony (and Ed and Rich) File List</a></b>.</li>
+	    <li><b><a href="shows/Misc/IllegalDownload/">Illegal Download</a></b>.</li>
+	    <li>Get This <b><a href="shows/Misc/Ring%20Tones/">Ring Tones</a></b>, for <a href="shows/Misc/Ring%20Tones/iphone/">iPhone</a> or <a href="shows/Misc/Ring%20Tones/MP3/">MP3</a>.</li>
+	    <li><b><a href="shows/Ed/worldcup/">Santo, Sam and Ed's Cup Fever</a></b> <i>(old AVI format, may need VLC or something similar to play)</i>.</li>
+	    <li><b><a href="shows/Ed/sportsfever/">Santo, Sam and Ed's Sports Fever</a></b> <i>(old AVI format, may need VLC or something similar to play)</i>.</li>
+            <li><b><a href="shows/Ed/totaIfootbaII/">Santo, Sam and Ed's Total Football</a></b> <i>(old AVI format, may need VLC or something similar to play)</i>.</li>
+	    <li><b><a href="shows/Santo%20and%20Sam%20-%20The%20Rush%20Hour%20-%20Going%20For%20Gold/">Santo and Sam - Going For Gold</a></b>.</li>
+	    <li><b><a href="shows/">Pure Humbug directory listings</a></b>: just browse and take your pick.</li>
             <li><b>Shortbus can no longer be seen from the link we had :(</b> probably for the best.</li>
         </ul>
-    </span>    
+        <p class="dates">Dates have been put in front of filenames so that they are listed in chronological order. Dates are in YYYYMMDD format. Some of these dates may be a little bit out, especially when the DD at the end has been left as 00. So let us know which dates and file-names are wrong if you'd like to help.</p>
+        <p class="contact">Please feel free to <a href="mailto:john@johncornell.org">email me</a>.</p>
+        <p class="contact"><a href="http://www.gnuterrypratchett.com/" target="_blank">GNU Terry Pratchett</a>.</p>
+    </main>
 	<script type="text/javascript">
 		ShowBanner();
 	</script>

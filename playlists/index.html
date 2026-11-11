@@ -5,7 +5,12 @@
 <title>Pure Humbug - Playlists</title>
 <style>
   body { font-family: "Courier New", Courier, monospace; margin: 2em; }
-  video#player { width: 640px; max-width: 100%; display: block; margin: 1em 0; background: #000; }
+  #audioplayer { width: 640px; max-width: 100%; display: block; margin: 1em 0; }
+  #videoplayer { width: 640px; max-width: 100%; display: block; margin: 1em 0; background: #000; }
+  .pagehead { display: flex; align-items: baseline; justify-content: space-between;
+              max-width: 640px; gap: 12px; }
+  .pagehead h1 { margin: 0; }
+  .pagehead .back { font-size: 0.85em; white-space: nowrap; }
   select { font-family: inherit; font-size: 1em; padding: 0.25em; max-width: 640px; }
   ol#tracks { max-width: 640px; padding-left: 2em; }
   #tracks li { margin: 0.2em 0; }
@@ -15,21 +20,34 @@
 </style>
 </head>
 <body>
+<div class="pagehead">
 <h1>Playlists</h1>
+<a class="back" href="../">Back to the front page</a>
+</div>
 <p>Now playing: <span id="nowplaying">nothing yet, pick a track below</span></p>
-<video id="player" controls preload="none"></video>
+<audio id="audioplayer" controls preload="none"></audio>
+<video id="videoplayer" controls preload="none"></video>
 <p><label for="pl">Playlist:</label>
 <select id="pl"><option>Loading playlists...</option></select></p>
 <ol id="tracks"><li>Loading track list...</li></ol>
-<p><a href="../">Back to the front page</a></p>
+
 <script>
 (function () {
-  var player = document.getElementById('player');
+  var audioEl = document.getElementById('audioplayer');
+  var videoEl = document.getElementById('videoplayer');
+  var els = { audio: audioEl, video: videoEl };
+  var activeEl = null;
   var list = document.getElementById('tracks');
   var now = document.getElementById('nowplaying');
   var sel = document.getElementById('pl');
   var tracks = [];
   var current = -1;
+
+  function isVideo(name) { return /\.(mp4|m4v|mov|webm)$/i.test(name); }
+  function setActive(kind) {
+    audioEl.style.display = kind === 'audio' ? 'block' : 'none';
+    videoEl.style.display = kind === 'video' ? 'block' : 'none';
+  }
 
   function urlOf(path) {
     return '/' + path.split('/').map(encodeURIComponent).join('/');
@@ -38,8 +56,13 @@
   function play(i) {
     if (current >= 0) list.children[current].classList.remove('current');
     current = i;
-    player.src = urlOf(tracks[i].path);
-    player.play();
+    var kind = isVideo(tracks[i].name) ? 'video' : 'audio';
+    setActive(kind);
+    var el = els[kind];
+    if (activeEl && activeEl !== el) { activeEl.pause(); activeEl.removeAttribute('src'); activeEl.load(); }
+    activeEl = el;
+    el.src = urlOf(tracks[i].path);
+    el.play();
     now.textContent = tracks[i].name;
     list.children[i].classList.add('current');
   }
@@ -117,8 +140,10 @@
     list.innerHTML = '<li>Could not load the playlist list.</li>';
   });
 
-  player.addEventListener('ended', function () {
-    if (current + 1 < tracks.length) play(current + 1);
+  [audioEl, videoEl].forEach(function (el) {
+    el.addEventListener('ended', function () {
+      if (current + 1 < tracks.length) play(current + 1);
+    });
   });
 })();
 </script>
