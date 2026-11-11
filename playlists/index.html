@@ -5,7 +5,7 @@
 <title>Pure Humbug - Playlists</title>
 <style>
   body { font-family: "Courier New", Courier, monospace; margin: 2em; }
-  audio { width: 640px; max-width: 100%; display: block; margin: 1em 0; }
+  video#player { width: 640px; max-width: 100%; display: block; margin: 1em 0; background: #000; }
   select { font-family: inherit; font-size: 1em; padding: 0.25em; max-width: 640px; }
   ol#tracks { max-width: 640px; padding-left: 2em; }
   #tracks li { margin: 0.2em 0; }
@@ -17,7 +17,7 @@
 <body>
 <h1>Playlists</h1>
 <p>Now playing: <span id="nowplaying">nothing yet &mdash; pick a track below</span></p>
-<audio id="player" controls preload="none"></audio>
+<video id="player" controls preload="none"></video>
 <p><label for="pl">Playlist:</label>
 <select id="pl"><option>Loading playlists...</option></select></p>
 <ol id="tracks"><li>Loading track list...</li></ol>
